@@ -209,10 +209,38 @@
         });
 
         // Form submission handler
-        document.getElementById('exemption-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Form submitted successfully!');
+     document.getElementById('exemption-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Collect form data
+    const formData = new FormData(e.target);
+    const data = {
+        docteur: formData.get('docteur[]'),
+        exemptionType: formData.get('exemption_type[]'),
+        specificTask: formData.get('specific_task[]'),
+        dateRange: formData.get('date_range[]'),
+    };
+
+    try {
+        // Send data to Google Apps Script
+        const response = await fetch('https://script.google.com/macros/s/AKfycbwncH8iZqGNTcB0PO1wwy3I7KGJGxbSy6Ju5GvWUtfyJojV-FqwVLfxVhddMk6tlh_qaA/exec', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
         });
+
+        const result = await response.json();
+        if (result.status === "success") {
+            alert("Request submitted successfully!");
+            e.target.reset();
+        } else {
+            alert("Failed to submit. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error submitting form:", error);
+        alert("There was an error. Please try again later.");
+    }
+});
     </script>
 </body>
 </html>
