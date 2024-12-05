@@ -172,16 +172,14 @@
   }));
 
   try {
-    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-    const apiUrl = 'https://script.google.com/macros/s/AKfycbxtZ6y8_sfPSu6kaPpjnam5KkXVppN22DJ8C5p0f5NUnIzJC0QvWUyAI3auLX3H7YtaaA/exec';
-
-    const response = await fetch(proxyUrl + apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ requests: formData }),
-    });
+    
+    const corsProxyUrl = 'https://corsproxy.io/?';  // CORS proxy URL
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbwncH8iZqGNTcB0PO1wwy3I7KGJGxbSy6Ju5GvWUtfyJojV-FqwVLfxVhddMk6tlh_qaA/exec';  // Your Google API endpoint
+    const response = await fetch(corsProxyUrl + apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ requests: formData }),
+});
 
     const result = await response.json();
     if (result.status === "success") {
