@@ -159,42 +159,37 @@
                 row.remove();
             }
         });
+//IT STARTS HERE
+        
+     document.getElementById('exemption-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-       document.getElementById('exemption-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
+    const rows = document.querySelectorAll('.request-row');
+    const formData = Array.from(rows).map(row => ({
+        docteur: row.querySelector('[name="docteur[]"]').value,
+        exemptionType: row.querySelector('[name="exemption_type[]"]').value,
+        specificTask: row.querySelector('[name="specific_task[]"]')?.value || '',
+        dateRange: row.querySelector('[name="date_range[]"]').value,
+    }));
 
-  const rows = document.querySelectorAll('.request-row');
-  const formData = Array.from(rows).map(row => ({
-    docteur: row.querySelector('[name="docteur[]"]').value,
-    exemptionType: row.querySelector('[name="exemption_type[]"]').value,
-    specificTask: row.querySelector('[name="specific_task[]"]')?.value || '',
-    dateRange: row.querySelector('[name="date_range[]"]').value,
-  }));
-
-  try {
-    
-    const corsProxyUrl = 'https://corsproxy.io/?';  // CORS proxy URL
-    const apiUrl = 'https://script.google.com/macros/s/AKfycbwncH8iZqGNTcB0PO1wwy3I7KGJGxbSy6Ju5GvWUtfyJojV-FqwVLfxVhddMk6tlh_qaA/exec';  // Your Google API endpoint
-    const response = await fetch(corsProxyUrl + apiUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ requests: formData }),
-});
+    const corsProxyUrl = 'https://api.allorigins.win/get?url=';  // AllOrigins proxy URL
+    const apiUrl = 'https://script.google.com/macros/s/your-api-endpoint/exec';  // Replace with your actual API URL
+    const response = await fetch(corsProxyUrl + encodeURIComponent(apiUrl), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requests: formData }),
+    });
 
     const result = await response.json();
     if (result.status === "success") {
-      alert("Request submitted successfully!");
-      e.target.reset();
+        alert("Request submitted successfully!");
+        e.target.reset();
     } else {
-      alert("Failed to submit. Please try again.");
+        alert("Failed to submit. Please try again.");
     }
-  } catch (error) {
-    console.error("Error submitting the form:", error);
-    alert("Error submitting the form.");
-  }
 });
 
-
+//IT ENDS HERE
         initializeFlatpickr();
     </script>
 </body>
