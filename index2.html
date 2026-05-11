@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDINT</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:          #f0f5fb;
+    --surface:     #ffffff;
+    --surface-2:   #e8f0fa;
+    --border:      #d0dff0;
+    --accent:      #3a7bd5;
+    --accent-soft: #ddeafb;
+    --accent-2:    #6aa3f0;
+    --text:        #1a2940;
+    --text-muted:  #6b87a8;
+    --shadow:      0 2px 12px rgba(58,123,213,0.08);
+    --shadow-hover:0 6px 24px rgba(58,123,213,0.16);
+    --radius:      14px;
+    --radius-sm:   8px;
+  }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: ‘DM Sans’, sans-serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+padding: 0;
+}
+
+/* ── Header ── */
+header {
+background: var(–surface);
+border-bottom: 1px solid var(–border);
+padding: 0 32px;
+height: 64px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+position: sticky;
+top: 0;
+z-index: 100;
+box-shadow: 0 1px 8px rgba(58,123,213,0.06);
+}
+
+.header-left {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.logo-icon {
+width: 36px;
+height: 36px;
+background: linear-gradient(135deg, var(–accent), var(–accent-2));
+border-radius: 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.logo-icon svg { color: white; }
+
+.site-title {
+font-size: 1.1rem;
+font-weight: 600;
+color: var(–text);
+letter-spacing: -0.02em;
+}
+
+.header-right {
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.header-pill {
+background: var(–accent-soft);
+color: var(–accent);
+font-size: 0.75rem;
+font-weight: 500;
+padding: 4px 12px;
+border-radius: 20px;
+font-family: ‘DM Mono’, monospace;
+}
+
+/* ── Search bar ── */
+.search-wrap {
+padding: 28px 32px 0;
+max-width: 900px;
+margin: 0 auto;
+}
+
+.search-box {
+position: relative;
+}
+
+.search-box input {
+width: 100%;
+padding: 12px 16px 12px 44px;
+background: var(–surface);
+border: 1.5px solid var(–border);
+border-radius: var(–radius);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 0.9rem;
+color: var(–text);
+outline: none;
+transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-box input:focus {
+border-color: var(–accent);
+box-shadow: 0 0 0 3px rgba(58,123,213,0.1);
+}
+
+.search-box input::placeholder { color: var(–text-muted); }
+
+.search-icon {
+position: absolute;
+left: 14px;
+top: 50%;
+transform: translateY(-50%);
+color: var(–text-muted);
+pointer-events: none;
+}
+
+/* ── Grid ── */
+.grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+gap: 16px;
+padding: 24px 32px 48px;
+max-width: 900px;
+margin: 0 auto;
+}
+
+/* ── Folder card ── */
+.folder {
+background: var(–surface);
+border: 1.5px solid var(–border);
+border-radius: var(–radius);
+overflow: hidden;
+box-shadow: var(–shadow);
+transition: box-shadow 0.25s, transform 0.2s;
+}
+
+.folder:hover {
+box-shadow: var(–shadow-hover);
+transform: translateY(-2px);
+}
+
+.folder-header {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 16px 18px;
+cursor: pointer;
+user-select: none;
+transition: background 0.15s;
+}
+
+.folder-header:hover { background: var(–accent-soft); }
+
+.folder-icon {
+width: 38px;
+height: 38px;
+border-radius: var(–radius-sm);
+display: flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+}
+
+.folder-meta { flex: 1; min-width: 0; }
+
+.folder-name {
+font-weight: 600;
+font-size: 0.95rem;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+color: var(–text);
+}
+
+.folder-count {
+font-size: 0.75rem;
+color: var(–text-muted);
+margin-top: 2px;
+}
+
+.chevron {
+color: var(–text-muted);
+transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+flex-shrink: 0;
+}
+
+.folder.open .chevron { transform: rotate(90deg); }
+
+/* ── Files list ── */
+.files {
+max-height: 0;
+overflow: hidden;
+transition: max-height 0.35s cubic-bezier(.4,0,.2,1);
+border-top: 0px solid var(–border);
+}
+
+.folder.open .files {
+max-height: 600px;
+border-top: 1.5px solid var(–border);
+}
+
+.file-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 10px 18px;
+text-decoration: none;
+color: var(–text);
+font-size: 0.875rem;
+transition: background 0.15s;
+border-bottom: 1px solid var(–surface-2);
+}
+
+.file-item:last-child { border-bottom: none; }
+
+.file-item:hover {
+background: var(–accent-soft);
+color: var(–accent);
+}
+
+.file-dot {
+width: 6px;
+height: 6px;
+border-radius: 50%;
+flex-shrink: 0;
+}
+
+.file-name {
+flex: 1;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.file-ext {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+color: var(–text-muted);
+background: var(–surface-2);
+padding: 2px 6px;
+border-radius: 4px;
+}
+
+/* ── Colour themes per folder ── */
+.c-blue   { background: #ddeafb; }
+.c-teal   { background: #d4f0ee; }
+.c-violet { background: #e8e2fb; }
+.c-amber  { background: #fdf0d9; }
+.c-rose   { background: #fde2e4; }
+.c-green  { background: #d8f5e4; }
+
+.c-blue   svg { color: #3a7bd5; }
+.c-teal   svg { color: #2a9d8f; }
+.c-violet svg { color: #7c5cbf; }
+.c-amber  svg { color: #e08c1a; }
+.c-rose   svg { color: #d94f5c; }
+.c-green  svg { color: #27a35c; }
+
+.dot-blue   { background: #3a7bd5; }
+.dot-teal   { background: #2a9d8f; }
+.dot-violet { background: #7c5cbf; }
+.dot-amber  { background: #e08c1a; }
+.dot-rose   { background: #d94f5c; }
+.dot-green  { background: #27a35c; }
+
+/* ── Empty state ── */
+.empty {
+padding: 16px 18px;
+font-size: 0.82rem;
+color: var(–text-muted);
+font-style: italic;
+}
+
+/* ── Search highlight ── */
+.folder.hidden { display: none; }
+.file-item.hidden { display: none; }
+
+/* ── Footer ── */
+footer {
+text-align: center;
+padding: 16px;
+font-size: 0.75rem;
+color: var(–text-muted);
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </div>
+    <span class="site-title">MDINT</span>
+  </div>
+  <div class="header-right">
+    <span class="header-pill">My Files</span>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search folders and files…" autocomplete="off">
+  </div>
+</div>
+
+<div class="grid" id="grid">
+
+  <!-- ── FOLDER 1 ── -->
+
+  <div class="folder" data-folder>
+    <div class="folder-header" onclick="toggle(this)">
+      <div class="folder-icon c-blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <div class="folder-meta">
+        <div class="folder-name">Documents</div>
+        <div class="folder-count">3 files</div>
+      </div>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+    <div class="files">
+      <a class="file-item" href="consult.docx" data-file>
+        <span class="file-dot dot-blue"></span>
+        <span class="file-name">Consult</span>
+        <span class="file-ext">DOCX</span>
+      </a>
+      <a class="file-item" href="note externe.docx" data-file>
+        <span class="file-dot dot-blue"></span>
+        <span class="file-name">Clinique Externe</span>
+        <span class="file-ext">DOCX</span>
+      </a>
+      <a class="file-item" href="note evol.docx" data-file>
+        <span class="file-dot dot-blue"></span>
+        <span class="file-name">Note d'évolution</span>
+        <span class="file-ext">DOCX</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── FOLDER 2 ── -->
+
+  <div class="folder" data-folder>
+    <div class="folder-header" onclick="toggle(this)">
+      <div class="folder-icon c-teal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>
+        </svg>
+      </div>
+      <div class="folder-meta">
+        <div class="folder-name">Horaires de groupe</div>
+        <div class="folder-count">2 files</div>
+      </div>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+    <div class="files">
+      <a class="file-item" href="https://msss365-my.sharepoint.com/:x:/r/personal/louis-pierre_grenier_med_ssss_gouv_qc_ca/Documents/M%C3%A9decine%20interne%20CSL/Horaire%20V1.2%20FINALE%20CSL%202026.xlsx?d=w9817efd3d27d4cd4b15ebc5d39aa5b59&csf=1&web=1&e=7q5UOk" data-file>
+        <span class="file-dot dot-teal"></span>
+        <span class="file-name">Horaire de groupe</span>
+        <span class="file-ext">XLSX</span>
+      </a>
+      <a class="file-item" href="https://msss365-my.sharepoint.com/:x:/r/personal/bao-huy_trinh_med_ssss_gouv_qc_ca/Documents/Attachments/MIGO.xlsx?d=w7c2904bb719a462aae47039f673f08e8&csf=1&web=1&e=Cqe8Cy" data-file>
+        <span class="file-dot dot-teal"></span>
+        <span class="file-name">MIGO</span>
+        <span class="file-ext">XLSX</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── FOLDER 3 ── -->
+
+  <div class="folder" data-folder>
+    <div class="folder-header" onclick="toggle(this)">
+      <div class="folder-icon c-violet">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </div>
+      <div class="folder-meta">
+        <div class="folder-name">Requêtes</div>
+        <div class="folder-count">3 files</div>
+      </div>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+    <div class="files">
+      <a class="file-item" href="labo.pdf" data-file>
+        <span class="file-dot dot-violet"></span>
+        <span class="file-name">Labos</span>
+        <span class="file-ext">PDF</span>
+      </a>
+      <a class="file-item" href="#" data-file>
+        <span class="file-dot dot-violet"></span>
+        <span class="file-name">-</span>
+        <span class="file-ext">-</span>
+      </a>
+     
+    </div>
+  </div>
+
+  <!-- ── FOLDER 4 ── -->
+
+  <div class="folder" data-folder>
+    <div class="folder-header" onclick="toggle(this)">
+      <div class="folder-icon c-amber">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+        </svg>
+      </div>
+      <div class="folder-meta">
+        <div class="folder-name">Notes</div>
+        <div class="folder-count">2 files</div>
+      </div>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+    <div class="files">
+      <a class="file-item" href="#" data-file>
+        <span class="file-dot dot-amber"></span>
+        <span class="file-name">Quick Notes</span>
+        <span class="file-ext">TXT</span>
+      </a>
+      <a class="file-item" href="#" data-file>
+        <span class="file-dot dot-amber"></span>
+        <span class="file-name">Ideas</span>
+        <span class="file-ext">MD</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── FOLDER 5 ── -->
+
+  <div class="folder" data-folder>
+    <div class="folder-header" onclick="toggle(this)">
+      <div class="folder-icon c-rose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </div>
+      <div class="folder-meta">
+        <div class="folder-name">Presentations</div>
+        <div class="folder-count">2 files</div>
+      </div>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+    <div class="files">
+      <a class="file-item" href="#" data-file>
+        <span class="file-dot dot-rose"></span>
+        <span class="file-name">Q1 Review</span>
+        <span class="file-ext">PPTX</span>
+      </a>
+      <a class="file-item" href="#" data-file>
+        <span class="file-dot dot-rose"></span>
+        <span class="file-name">Onboarding Deck</span>
+        <span class="file-ext">PPTX</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── FOLDER 6 ── -->
+
+  <div class="folder" data-folder>
+    <div class="folder-header" onclick="toggle(this)">
+      <div class="folder-icon c-green">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+        </svg>
+      </div>
+      <div class="folder-meta">
+        <div class="folder-name">Code</div>
+        <div class="folder-count">2 files</div>
+      </div>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+    <div class="files">
+      <a class="file-item" href="#" data-file>
+        <span class="file-dot dot-green"></span>
+        <span class="file-name">index</span>
+        <span class="file-ext">HTML</span>
+      </a>
+      <a class="file-item" href="#" data-file>
+        <span class="file-dot dot-green"></span>
+        <span class="file-name">styles</span>
+        <span class="file-ext">CSS</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<footer>MDINT · Edit <code>index.html</code> to add your real folders and file links</footer>
+
+<script>
+  function toggle(header) {
+    const folder = header.closest('.folder');
+    folder.classList.toggle('open');
+    const count = folder.querySelectorAll('.file-item:not(.hidden)').length;
+    folder.querySelector('.folder-count').textContent = count + ' file' + (count !== 1 ? 's' : '');
+  }
+
+  // Search
+  const searchInput = document.getElementById('search');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    document.querySelectorAll('[data-folder]').forEach(folder => {
+      const folderName = folder.querySelector('.folder-name').textContent.toLowerCase();
+      let anyVisible = false;
+      folder.querySelectorAll('[data-file]').forEach(file => {
+        const fileName = file.querySelector('.file-name').textContent.toLowerCase();
+        const match = !q || folderName.includes(q) || fileName.includes(q);
+        file.classList.toggle('hidden', !match);
+        if (match) anyVisible = true;
+      });
+      const folderMatch = !q || folderName.includes(q) || anyVisible;
+      folder.classList.toggle('hidden', !folderMatch);
+      if (q && anyVisible) folder.classList.add('open');
+      else if (!q) folder.classList.remove('open');
+
+      // Update count
+      const visible = folder.querySelectorAll('[data-file]:not(.hidden)').length;
+      folder.querySelector('.folder-count').textContent = visible + ' file' + (visible !== 1 ? 's' : '');
+    });
+  });
+</script>
+
+</body>
+</html>
