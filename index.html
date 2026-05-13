@@ -100,17 +100,15 @@ box-shadow: 0 0 0 3px rgba(58,123,213,0.1);
 
 /* ── GRID ── */
 .grid {
-max-width: 1080px;
-margin: 24px auto 48px;
-padding: 0 32px;
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 16px;
+  max-width: 1080px;
+  margin: 24px auto 48px;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
 }
-
-@media (max-width: 860px) { .grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 520px) { .grid { grid-template-columns: 1fr; padding: 0 16px; } }
-
+  
 /* ── FOLDER CARD ── */
 .folder {
 background: #fff;
@@ -189,6 +187,7 @@ transition: max-height .35s cubic-bezier(.4,0,.2,1);
 
 .folder.open .file-list {
 max-height: 600px;
+overflow-y: auto;
 border-top: 1.5px solid #e8f0fa;
 }
 
@@ -384,17 +383,21 @@ padding: 0 0 28px;
 </div>
 
 <script>
+function normalize(str) {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+  
 function toggle(btn) {
   btn.closest('.folder').classList.toggle('open');
 }
 
 document.getElementById('search').addEventListener('input', function() {
-  var q = this.value.toLowerCase().trim();
+  var q = normalize(this.value.trim());  // ← was .toLowerCase().trim()
   document.querySelectorAll('[data-folder]').forEach(function(folder) {
-    var name = folder.querySelector('.f-name').textContent.toLowerCase();
+    var name = normalize(folder.querySelector('.f-name').textContent);  // ← 
     var anyMatch = false;
     folder.querySelectorAll('[data-file]').forEach(function(file) {
-      var fn = file.querySelector('.f-filename').textContent.toLowerCase();
+      var fn = normalize(file.querySelector('.f-filename').textContent);  // ←
       var match = !q || name.includes(q) || fn.includes(q);
       file.classList.toggle('hidden', !match);
       if (match) anyMatch = true;
