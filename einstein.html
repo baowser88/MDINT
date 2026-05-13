@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Medical Calculator Suite</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+body{
+  margin:0;
+  background:#f3f5f8;
+  color:#222;
+}
+
+.app{
+  display:flex;
+  min-height:100vh;
+}
+
+.sidebar{
+  width:280px;
+  background:#1f2937;
+  color:white;
+  padding:20px;
+  overflow-y:auto;
+}
+
+.sidebar h2{
+  margin-top:0;
+  margin-bottom:20px;
+}
+
+.sidebar button{
+  width:100%;
+  border:none;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  background:#374151;
+  color:white;
+  cursor:pointer;
+  text-align:left;
+  transition:0.2s;
+}
+
+.sidebar button:hover{
+  background:#4b5563;
+}
+
+.main{
+  flex:1;
+  padding:30px;
+}
+
+.card{
+  background:white;
+  padding:24px;
+  border-radius:16px;
+  max-width:850px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+
+.card h1{
+  margin-top:0;
+}
+
+.field{
+  margin-bottom:18px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:8px;
+  font-weight:bold;
+}
+
+.field input,
+.field select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+.btn{
+  padding:12px 18px;
+  border:none;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+  font-size:16px;
+}
+
+.btn:hover{
+  background:#1d4ed8;
+}
+
+.result{
+  margin-top:20px;
+  background:#eef6ff;
+  padding:18px;
+  border-radius:12px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.subtext{
+  margin-top:10px;
+  font-size:14px;
+  color:#444;
+  font-weight:normal;
+}
+
+.check-group{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.check-group label{
+  background:#f4f6f9;
+  padding:12px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.check-group input{
+  margin-right:10px;
+}
+
+.two-col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+@media(max-width:900px){
+
+  .app{
+    flex-direction:column;
+  }
+
+  .sidebar{
+    width:100%;
+  }
+
+  .two-col{
+    grid-template-columns:1fr;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="sidebar">
+
+    <h2>MedCalc Suite</h2>
+
+    <button onclick="showCalc('bmi')">BMI</button>
+
+    <button onclick="showCalc('converter')">
+      SI Unit Converter
+    </button>
+
+    <button onclick="showCalc('fena')">
+      FeNa
+    </button>
+
+    <button onclick="showCalc('child')">
+      Child-Pugh
+    </button>
+
+    <button onclick="showCalc('meld')">
+      MELD
+    </button>
+
+    <button onclick="showCalc('chads')">
+      CHA₂DS₂-VASc
+    </button>
+
+    <button onclick="showCalc('hasbled')">
+      HAS-BLED
+    </button>
+
+    <button onclick="showCalc('pesi')">
+      PESI
+    </button>
+
+    <button onclick="showCalc('spesi')">
+      Simplified PESI
+    </button>
+
+    <button onclick="showCalc('steroid')">
+      Steroid Equivalency
+    </button>
+
+    <button onclick="showCalc('pregnancy')">
+      Pregnancy Wheel
+    </button>
+
+  </div>
+
+  <div class="main">
+
+    <div id="calculator-container"></div>
+
+  </div>
+
+</div>
+
+<script>
+
+function showCalc(calc){
+
+  const c = document.getElementById("calculator-container");
+
+  // BMI
+  if(calc==="bmi"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>BMI Calculator</h1>
+
+        <div class="two-col">
+
+          <div class="field">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight">
+          </div>
+
+          <div class="field">
+            <label>Height (cm)</label>
+            <input type="number" id="height">
+          </div>
+
+        </div>
+
+        <button class="btn" onclick="calculateBMI()">
+          Calculate
+        </button>
+
+        <div class="result" id="bmiResult"></div>
+
+      </div>
+    `;
+  }
+
+  // SI CONVERTER
+  if(calc==="converter"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>SI Unit Converter</h1>
+
+        <div class="field">
+
+          <label>Lab</label>
+
+          <select id="conversionType">
+
+            <option value="glucose">
+              Glucose
+            </option>
+
+            <option value="creatinine">
+              Creatinine
+            </option>
+
+            <option value="bilirubin">
+              Bilirubin
+            </option>
+
+            <option value="calcium">
+              Calcium
+            </option>
+
+            <option value="cholesterol">
+              Cholesterol
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label>Value</label>
+
+          <input type="number" id="convertValue">
+
+        </div>
+
+        <div class="field">
+
+          <label>Direction</label>
+
+          <select id="direction">
+
+            <option value="toConv">
+              SI → Conventional
+            </option>
+
+            <option value="toSI">
+              Conventional → SI
+            </option>
+
+          </select>
+
+        </div>
+
+        <button class="btn" onclick="convertUnits()">
+          Convert
+        </button>
+
+        <div class="result" id="converterResult"></div>
+
+      </div>
+    `;
+  }
+
+  // FENA
+  if(calc==="fena"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>FeNa</h1>
+
+        <div class="two-col">
+
+          <div class="field">
+            <label>Urine Sodium (mmol/L)</label>
+            <input type="number" id="urineNa">
+          </div>
+
+          <div class="field">
+            <label>Plasma Sodium (mmol/L)</label>
+            <input type="number" id="plasmaNa">
+          </div>
+
+          <div class="field">
+            <label>Urine Creatinine (µmol/L)</label>
+            <input type="number" id="urineCr">
+          </div>
+
+          <div class="field">
+            <label>Plasma Creatinine (µmol/L)</label>
+            <input type="number" id="plasmaCr">
+          </div>
+
+        </div>
+
+        <button class="btn" onclick="calculateFeNa()">
+          Calculate
+        </button>
+
+        <div class="result" id="fenaResult"></div>
+
+      </div>
+    `;
+  }
+
+  // CHILD PUGH
+  if(calc==="child"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>Child-Pugh</h1>
+
+        <div class="field">
+
+          <label>Bilirubin (µmol/L)</label>
+
+          <select id="cpBili">
+            <option value="1">< 34</option>
+            <option value="2">34-50</option>
+            <option value="3">> 50</option>
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label>Albumin (g/L)</label>
+
+          <select id="cpAlbumin">
+            <option value="1">> 35</option>
+            <option value="2">28-35</option>
+            <option value="3">< 28</option>
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label>INR</label>
+
+          <select id="cpINR">
+            <option value="1">< 1.7</option>
+            <option value="2">1.7-2.3</option>
+            <option value="3">> 2.3</option>
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label>Ascites</label>
+
+          <select id="cpAscites">
+            <option value="1">None</option>
+            <option value="2">Mild</option>
+            <option value="3">Moderate-Severe</option>
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label>Encephalopathy</label>
+
+          <select id="cpEnceph">
+            <option value="1">None</option>
+            <option value="2">Grade I-II</option>
+            <option value="3">Grade III-IV</option>
+          </select>
+
+        </div>
+
+        <button class="btn" onclick="calculateChildPugh()">
+          Calculate
+        </button>
+
+        <div class="result" id="childResult"></div>
+
+      </div>
+    `;
+  }
+
+  // MELD
+  if(calc==="meld"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>MELD Score</h1>
+
+        <div class="two-col">
+
+          <div class="field">
+            <label>Bilirubin (µmol/L)</label>
+            <input type="number" id="meldBili">
+          </div>
+
+          <div class="field">
+            <label>Creatinine (µmol/L)</label>
+            <input type="number" id="meldCreat">
+          </div>
+
+          <div class="field">
+            <label>INR</label>
+            <input type="number" step="0.1" id="meldINR">
+          </div>
+
+        </div>
+
+        <button class="btn" onclick="calculateMeld()">
+          Calculate
+        </button>
+
+        <div class="result" id="meldResult"></div>
+
+      </div>
+    `;
+  }
+
+  // CHADS
+  if(calc==="chads"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>CHA₂DS₂-VASc</h1>
+
+        <div class="check-group">
+
+          <label><input type="checkbox" class="chads" value="1"> CHF/LV dysfunction</label>
+
+          <label><input type="checkbox" class="chads" value="1"> Hypertension</label>
+
+          <label><input type="checkbox" class="chads" value="1"> Age 65-74</label>
+
+          <label><input type="checkbox" class="chads" value="2"> Age ≥75</label>
+
+          <label><input type="checkbox" class="chads" value="1"> Diabetes</label>
+
+          <label><input type="checkbox" class="chads" value="2"> Stroke/TIA/TE</label>
+
+          <label><input type="checkbox" class="chads" value="1"> Vascular disease</label>
+
+          <label><input type="checkbox" class="chads" value="1"> Female sex</label>
+
+        </div>
+
+        <button class="btn" onclick="calculateChads()">
+          Calculate
+        </button>
+
+        <div class="result" id="chadsResult"></div>
+
+      </div>
+    `;
+  }
+
+  // HAS BLED
+  if(calc==="hasbled"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>HAS-BLED</h1>
+
+        <div class="check-group">
+
+          <label><input type="checkbox" class="hasbled"> Hypertension</label>
+
+          <label><input type="checkbox" class="hasbled"> Abnormal renal function</label>
+
+          <label><input type="checkbox" class="hasbled"> Abnormal liver function</label>
+
+          <label><input type="checkbox" class="hasbled"> Stroke</label>
+
+          <label><input type="checkbox" class="hasbled"> Bleeding history</label>
+
+          <label><input type="checkbox" class="hasbled"> Labile INR</label>
+
+          <label><input type="checkbox" class="hasbled"> Elderly</label>
+
+          <label><input type="checkbox" class="hasbled"> Drugs/alcohol</label>
+
+        </div>
+
+        <button class="btn" onclick="calculateHasBled()">
+          Calculate
+        </button>
+
+        <div class="result" id="hasbledResult"></div>
+
+      </div>
+    `;
+  }
+
+  // PESI
+  if(calc==="pesi"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>PESI</h1>
+
+        <div class="field">
+          <label>Age</label>
+          <input type="number" id="pesiAge">
+        </div>
+
+        <div class="check-group">
+
+          <label><input type="checkbox" class="pesi" value="10"> Male sex</label>
+
+          <label><input type="checkbox" class="pesi" value="30"> Cancer</label>
+
+          <label><input type="checkbox" class="pesi" value="10"> Heart failure</label>
+
+          <label><input type="checkbox" class="pesi" value="10"> Chronic lung disease</label>
+
+          <label><input type="checkbox" class="pesi" value="20"> Pulse ≥110</label>
+
+          <label><input type="checkbox" class="pesi" value="30"> SBP <100</label>
+
+          <label><input type="checkbox" class="pesi" value="20"> RR ≥30</label>
+
+          <label><input type="checkbox" class="pesi" value="20"> Temp <36°C</label>
+
+          <label><input type="checkbox" class="pesi" value="60"> AMS</label>
+
+          <label><input type="checkbox" class="pesi" value="20"> O₂ sat <90%</label>
+
+        </div>
+
+        <button class="btn" onclick="calculatePesi()">
+          Calculate
+        </button>
+
+        <div class="result" id="pesiResult"></div>
+
+      </div>
+    `;
+  }
+
+  // SPESI
+  if(calc==="spesi"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>Simplified PESI</h1>
+
+        <div class="check-group">
+
+          <label><input type="checkbox" class="spesi"> Age >80</label>
+
+          <label><input type="checkbox" class="spesi"> Cancer</label>
+
+          <label><input type="checkbox" class="spesi"> Chronic cardiopulmonary disease</label>
+
+          <label><input type="checkbox" class="spesi"> Pulse ≥110</label>
+
+          <label><input type="checkbox" class="spesi"> SBP <100</label>
+
+          <label><input type="checkbox" class="spesi"> O₂ sat <90%</label>
+
+        </div>
+
+        <button class="btn" onclick="calculateSPesi()">
+          Calculate
+        </button>
+
+        <div class="result" id="spesiResult"></div>
+
+      </div>
+    `;
+  }
+
+  // STEROID
+  if(calc==="steroid"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>Corticosteroid Equivalency</h1>
+
+        <div class="field">
+
+          <label>Drug</label>
+
+          <select id="steroidType">
+
+            <option value="hydrocortisone">
+              Hydrocortisone
+            </option>
+
+            <option value="prednisone">
+              Prednisone
+            </option>
+
+            <option value="prednisolone">
+              Prednisolone
+            </option>
+
+            <option value="methylpred">
+              Methylprednisolone
+            </option>
+
+            <option value="dexamethasone">
+              Dexamethasone
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label>Dose (mg)</label>
+
+          <input type="number" id="steroidDose">
+
+        </div>
+
+        <button class="btn" onclick="convertSteroid()">
+          Convert
+        </button>
+
+        <div class="result" id="steroidResult"></div>
+
+      </div>
+    `;
+  }
+
+  // PREGNANCY
+  if(calc==="pregnancy"){
+
+    c.innerHTML = `
+      <div class="card">
+
+        <h1>Pregnancy Wheel</h1>
+
+        <div class="field">
+
+          <label>Last Menstrual Period</label>
+
+          <input type="date" id="lmp">
+
+        </div>
+
+        <button class="btn" onclick="calculatePregnancy()">
+          Calculate
+        </button>
+
+        <div class="result" id="pregnancyResult"></div>
+
+      </div>
+    `;
+  }
+
+}
+
+// DEFAULT
+showCalc("bmi");
+
+// BMI
+function calculateBMI(){
+
+  const w=parseFloat(document.getElementById("weight").value);
+  const h=parseFloat(document.getElementById("height").value)/100;
+
+  const bmi=w/(h*h);
+
+  let category="";
+
+  if(bmi<18.5) category="Underweight";
+  else if(bmi<25) category="Normal";
+  else if(bmi<30) category="Overweight";
+  else category="Obesity";
+
+  document.getElementById("bmiResult").innerHTML=`
+    BMI: ${bmi.toFixed(1)}
+    <div class="subtext">${category}</div>
+  `;
+}
+
+// CONVERTER
+function convertUnits(){
+
+  const type=document.getElementById("conversionType").value;
+  const value=parseFloat(document.getElementById("convertValue").value);
+  const dir=document.getElementById("direction").value;
+
+  let result="";
+
+  const conversions={
+
+    glucose:18,
+    creatinine:88.4,
+    bilirubin:17.1,
+    calcium:4,
+    cholesterol:38.67
+
+  };
+
+  const factor=conversions[type];
+
+  if(dir==="toConv"){
+
+    result=(value*factor).toFixed(2);
+
+  }else{
+
+    result=(value/factor).toFixed(2);
+
+  }
+
+  document.getElementById("converterResult").innerHTML=`
+    Result: ${result}
+  `;
+}
+
+// FENA
+function calculateFeNa(){
+
+  const uNa=parseFloat(document.getElementById("urineNa").value);
+  const pNa=parseFloat(document.getElementById("plasmaNa").value);
+  const uCr=parseFloat(document.getElementById("urineCr").value);
+  const pCr=parseFloat(document.getElementById("plasmaCr").value);
+
+  const fena=((uNa*pCr)/(pNa*uCr))*100;
+
+  let interpretation=fena<1
+    ? "Suggests prerenal state"
+    : "Suggests intrinsic renal injury";
+
+  document.getElementById("fenaResult").innerHTML=`
+    FeNa: ${fena.toFixed(2)}%
+    <div class="subtext">${interpretation}</div>
+  `;
+}
+
+// CHILD PUGH
+function calculateChildPugh(){
+
+  const total=
+    parseInt(cpBili.value)+
+    parseInt(cpAlbumin.value)+
+    parseInt(cpINR.value)+
+    parseInt(cpAscites.value)+
+    parseInt(cpEnceph.value);
+
+  let grade="";
+
+  if(total<=6) grade="Class A";
+  else if(total<=9) grade="Class B";
+  else grade="Class C";
+
+  document.getElementById("childResult").innerHTML=`
+    Child-Pugh ${grade}
+    <div class="subtext">Score: ${total}</div>
+  `;
+}
+
+// MELD
+function calculateMeld(){
+
+  let bili=parseFloat(meldBili.value)/17.1;
+  let creat=parseFloat(meldCreat.value)/88.4;
+  let inr=parseFloat(meldINR.value);
+
+  bili=Math.max(bili,1);
+  creat=Math.max(creat,1);
+  inr=Math.max(inr,1);
+
+  const meld=
+    3.78*Math.log(bili)+
+    11.2*Math.log(inr)+
+    9.57*Math.log(creat)+
+    6.43;
+
+  document.getElementById("meldResult").innerHTML=`
+    MELD Score: ${Math.round(meld)}
+  `;
+}
+
+// CHADS
+function calculateChads(){
+
+  let score=0;
+
+  document.querySelectorAll(".chads").forEach(x=>{
+    if(x.checked) score+=parseInt(x.value);
+  });
+
+  let rec=score>=2
+    ? "Anticoagulation generally recommended"
+    : "Lower stroke risk";
+
+  document.getElementById("chadsResult").innerHTML=`
+    CHA₂DS₂-VASc: ${score}
+    <div class="subtext">${rec}</div>
+  `;
+}
+
+// HASBLED
+function calculateHasBled(){
+
+  let score=0;
+
+  document.querySelectorAll(".hasbled").forEach(x=>{
+    if(x.checked) score++;
+  });
+
+  let risk=score>=3
+    ? "High bleeding risk"
+    : "Lower bleeding risk";
+
+  document.getElementById("hasbledResult").innerHTML=`
+    HAS-BLED: ${score}
+    <div class="subtext">${risk}</div>
+  `;
+}
+
+// PESI
+function calculatePesi(){
+
+  let score=parseInt(document.getElementById("pesiAge").value)||0;
+
+  document.querySelectorAll(".pesi").forEach(x=>{
+    if(x.checked) score+=parseInt(x.value);
+  });
+
+  let risk="";
+
+  if(score<=65) risk="Class I";
+  else if(score<=85) risk="Class II";
+  else if(score<=105) risk="Class III";
+  else if(score<=125) risk="Class IV";
+  else risk="Class V";
+
+  document.getElementById("pesiResult").innerHTML=`
+    PESI Score: ${score}
+    <div class="subtext">${risk}</div>
+  `;
+}
+
+// SPESI
+function calculateSPesi(){
+
+  let score=0;
+
+  document.querySelectorAll(".spesi").forEach(x=>{
+    if(x.checked) score++;
+  });
+
+  let risk=score===0
+    ? "Low risk"
+    : "Higher 30-day mortality risk";
+
+  document.getElementById("spesiResult").innerHTML=`
+    sPESI Score: ${score}
+    <div class="subtext">${risk}</div>
+  `;
+}
+
+// STEROID
+function convertSteroid(){
+
+  const type=steroidType.value;
+  const dose=parseFloat(steroidDose.value);
+
+  const eq={
+    hydrocortisone:20,
+    prednisone:5,
+    prednisolone:5,
+    methylpred:4,
+    dexamethasone:0.75
+  };
+
+  const hydro=dose*(20/eq[type]);
+
+  document.getElementById("steroidResult").innerHTML=`
+    Hydrocortisone: ${hydro.toFixed(1)} mg
+
+    <div class="subtext">
+
+      Prednisone:
+      ${(hydro/4).toFixed(1)} mg<br><br>
+
+      Methylprednisolone:
+      ${(hydro/5).toFixed(1)} mg<br><br>
+
+      Dexamethasone:
+      ${(hydro/26.67).toFixed(2)} mg
+
+    </div>
+  `;
+}
+
+// PREGNANCY
+function calculatePregnancy(){
+
+  const lmp=new Date(document.getElementById("lmp").value);
+
+  const edd=new Date(lmp);
+  edd.setDate(edd.getDate()+280);
+
+  const today=new Date();
+
+  const diff=today-lmp;
+
+  const weeks=Math.floor(diff/(1000*60*60*24*7));
+
+  document.getElementById("pregnancyResult").innerHTML=`
+    Gestational age: ${weeks} weeks
+
+    <div class="subtext">
+
+      Estimated Due Date:
+      ${edd.toDateString()}
+
+    </div>
+  `;
+}
+
+</script>
+
+</body>
+</html>
